@@ -4,10 +4,10 @@
 
 class TestAllocator : public ::testing::Test {
 protected:
-	Allocator allocator;
+	allocator::Allocator allocator;
 	void SetUp() {
-		allocator.makeAllocator(10);
         std::cout << "SetUp" << std::endl;
+		allocator.makeAllocator(10);
 	}
 	void TearDown() {
         std::cout << "TearDown" << std::endl;
