@@ -24,7 +24,7 @@ namespace allocator {
     }
 
     Allocator::~Allocator() {
-        if (myMemorySize != 0)
+        if (myMemory != nullptr)
             delete[] myMemory;
     }
 }
