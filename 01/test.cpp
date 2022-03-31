@@ -30,6 +30,16 @@ TEST_F(TestAllocator, test_alloc) {
 	char* p2 = allocator.alloc(10);
 	ASSERT_EQ(p2 - p1, 10);
 	
+	allocator.makeAllocator(100);
+	p1 = allocator.alloc(5);
+	p2 = allocator.alloc(20);
+	ASSERT_EQ(p2 - p1, 5);
+
+	allocator.makeAllocator(100);
+	p1 = allocator.alloc(30);
+	p2 = allocator.alloc(1);
+	ASSERT_EQ(p2 - p1, 30);
+
 	allocator.makeAllocator(1);
 	ASSERT_NE(allocator.alloc(1), nullptr);
 	ASSERT_EQ(allocator.alloc(1), nullptr);
