@@ -8,25 +8,33 @@ namespace token_parser {
     bool TokenParser::IsDigitToken(std::string token) {
         if (!token.length())
             return false;
-        for (size_t i = 0; i < token.length(); i++)
-            if (token[i] < '0' || token[i] > '9')
-                return false;
+        for (size_t i = 0; i < token.length(); i++) {
+	        if (token[i] < '0' || token[i] > '9')
+		        return false;
+        }
+		try {
+			std::stoull(token);
+		}
+		catch(...) {
+			return false;
+		}
         return true;
     }
-    void TokenParser::SetStartCallback(std::function<void(void)> func) {
-        StartCallback = func;
+
+    void TokenParser::SetStartCallback(void_func_t func) {
+	    TokenParser::StartCallback = func;
     }
 
-    void TokenParser::SetEndCallback(std::function<void(void)> func) {
-        EndCallback = func;
+    void TokenParser::SetEndCallback(void_func_t func) {
+	    TokenParser::EndCallback = func;
     }
 
-    void TokenParser::SetDigitCallback(std::function<void(std::string)> func) {
-        DigitCallback = func;
+    void TokenParser::SetDigitCallback(uint64_func_t func) {
+	    TokenParser::DigitCallback = func;
     }
 
-    void TokenParser::SetStringCallback(std::function<void(std::string)> func) {
-        StringCallback = func;
+    void TokenParser::SetStringCallback(str_func_t func) {
+	    TokenParser::StringCallback = func;
     }
 
     void TokenParser::Parse(const std::string & input_str) {
@@ -43,9 +51,9 @@ namespace token_parser {
                 std::string token = std::string(input_str, start, i-start);
                 if (TokenParser::IsDigitToken(token)) {
                     if (TokenParser::DigitCallback)
-                        TokenParser::DigitCallback(token);
+						TokenParser::DigitCallback(std::stoull(token));
                 }
-                else if (StringCallback)
+                else if (TokenParser::StringCallback)
                     TokenParser::StringCallback(token);
             }
         }

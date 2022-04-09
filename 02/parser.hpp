@@ -4,28 +4,33 @@
 #include <functional>
 #include <string>
 
+
 namespace token_parser {
-    class TokenParser {
-        std::function <void()> StartCallback;
-        std::function <void()> EndCallback;
-        std::function <void(std::string)> StringCallback;
-        std::function <void(std::string)> DigitCallback;
+	using void_func_t = std::function <void()>;
+	using uint64_func_t = std::function <void(uint64_t)>;
+	using str_func_t = std::function <void(std::string)>;
+
+	class TokenParser {
+	    void_func_t StartCallback;
+	    void_func_t EndCallback;
+	    str_func_t StringCallback;
+        uint64_func_t DigitCallback;
     public:
         TokenParser() = default;
 
         bool IsDigitToken(std::string);
 
         // Устанавливаем callback-функцию перед стартом парсинга.
-        void SetStartCallback(std::function <void()>);
+        void SetStartCallback(void_func_t);
 
         // Устанавливаем callback-функцию после окончания парсинга.
-        void SetEndCallback(std::function <void()>);
+        void SetEndCallback(void_func_t);
 
         // Устанавливаем callback-функцию для обработки чисел.
-        void SetDigitCallback(std::function <void(std::string)>);
+        void SetDigitCallback(uint64_func_t);
 
         // Устанавливаем callback-функцию для обработки строк-токенов.
-        void SetStringCallback(std::function <void(std::string)>);
+        void SetStringCallback(str_func_t);
 
         void Parse(const std::string &);
     };

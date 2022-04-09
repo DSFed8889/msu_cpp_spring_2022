@@ -8,8 +8,8 @@ void my_string_parser(std::string token) {
     count += token.length();
 }
 
-void my_digit_parser(std::string token) {
-    sum += std::stoi(token);
+void my_digit_parser(uint64_t token) {
+    sum += token;
 }
 
 void start_func(void) {
