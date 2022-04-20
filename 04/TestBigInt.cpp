@@ -1,0 +1,610 @@
+#include <iostream>
+#include <string>
+#include <sstream>
+#include <typeinfo>
+#include <gtest/gtest.h>
+#include "BigInt.hpp"
+
+using namespace big_int;
+
+class TestBigInt : public ::testing::Test {
+protected:
+	void SetUp() {
+		std::cout << "SetUp" << std::endl;
+	}
+	void TearDown() {
+		std::cout << "TearDown" << std::endl;
+	}
+};
+
+TEST_F(TestBigInt, test_constructor_exceptions) {
+	ASSERT_NO_THROW(BigInt());
+	ASSERT_NO_THROW(BigInt(0));
+	ASSERT_NO_THROW(BigInt(-0));
+	ASSERT_NO_THROW(BigInt(1));
+	ASSERT_NO_THROW(BigInt(-1));
+	ASSERT_NO_THROW(BigInt(100));
+	ASSERT_NO_THROW(BigInt(001));
+	ASSERT_NO_THROW(BigInt(0000000000000));
+	ASSERT_NO_THROW(BigInt(1111111111));
+	ASSERT_NO_THROW(BigInt(-000001));
+	ASSERT_NO_THROW(BigInt(-000000));
+	ASSERT_NO_THROW(BigInt(789123345));
+	ASSERT_NO_THROW(BigInt(2147483647));
+	ASSERT_NO_THROW(BigInt(-2147483647));
+	ASSERT_NO_THROW(BigInt(+2147483647));
+	ASSERT_THROW(BigInt(""), std::invalid_argument);
+	ASSERT_NO_THROW(BigInt("0"));
+	ASSERT_NO_THROW(BigInt("-0"));
+	ASSERT_THROW(BigInt("-"), std::invalid_argument);
+	ASSERT_NO_THROW(BigInt("1"));
+	ASSERT_NO_THROW(BigInt("000001"));
+	ASSERT_NO_THROW(BigInt("-00000001"));
+	ASSERT_NO_THROW(BigInt("123456"));
+	ASSERT_NO_THROW(BigInt("-123456"));
+	ASSERT_THROW(BigInt("--123456"), std::invalid_argument);
+	ASSERT_NO_THROW(BigInt("+0"));
+	ASSERT_NO_THROW(BigInt("+00000"));
+	ASSERT_NO_THROW(BigInt("+1"));
+	ASSERT_NO_THROW(BigInt("+2"));
+	ASSERT_NO_THROW(BigInt("+123456"));
+	ASSERT_NO_THROW(BigInt("+00000123456"));
+	ASSERT_NO_THROW(BigInt("+12300000"));
+	ASSERT_THROW(BigInt("+"), std::invalid_argument);
+	ASSERT_THROW(BigInt("++"), std::invalid_argument);
+	ASSERT_THROW(BigInt("123345d234"), std::invalid_argument);
+	ASSERT_THROW(BigInt("+d233453234"), std::invalid_argument);
+	ASSERT_THROW(BigInt("-d233453234"), std::invalid_argument);
+	ASSERT_THROW(BigInt("d233453234"), std::invalid_argument);
+	ASSERT_THROW(BigInt("1233453234s"), std::invalid_argument);
+	ASSERT_THROW(BigInt("Hello, World!"), std::invalid_argument);
+}
+
+TEST_F(TestBigInt, test_cout_and_real_nums) {
+	std::ostringstream BigIntStream;
+	std::ostringstream TestStream;
+	std::streambuf* p_cout_streambuf = std::cout.rdbuf();
+	std::cout.rdbuf(BigIntStream.rdbuf());
+
+	TestStream << "1000" << std::endl;
+	std::cout << BigInt(1000) << std::endl;
+	TestStream << "0" << std::endl;
+	std::cout << BigInt() << std::endl;
+	TestStream << "0" << std::endl;
+	std::cout << BigInt(0) << std::endl;
+	TestStream << "0" << std::endl;
+	std::cout << BigInt(-0) << std::endl;
+	TestStream << "-1" << std::endl;
+	std::cout << BigInt(-1) << std::endl;
+	TestStream << "-10" << std::endl;
+	std::cout << BigInt(-10) << std::endl;
+	TestStream << "-123" << std::endl;
+	std::cout << BigInt(-123) << std::endl;
+	TestStream << "1" << std::endl;
+	std::cout << BigInt(1) << std::endl;
+	TestStream << "2147483647" << std::endl;
+	std::cout << BigInt(2147483647) << std::endl;
+	TestStream << "-2147483647" << std::endl;
+	std::cout << BigInt(-2147483647) << std::endl;
+	TestStream << "2147483647" << std::endl;
+	std::cout << BigInt(+2147483647) << std::endl;
+	TestStream << "0" << std::endl;
+	std::cout << BigInt("0") << std::endl;
+	TestStream << "0" << std::endl;
+	std::cout << BigInt("-0") << std::endl;
+	TestStream << "-1" << std::endl;
+	std::cout << BigInt("-1") << std::endl;
+	TestStream << "1" << std::endl;
+	std::cout << BigInt("1") << std::endl;
+	TestStream << "11111111111111111111111111" << std::endl;
+	std::cout << BigInt("11111111111111111111111111") << std::endl;
+	TestStream << "-11111111111111111111111111" << std::endl;
+	std::cout << BigInt("-11111111111111111111111111") << std::endl;
+	TestStream << "11111111111111111111111111" << std::endl;
+	std::cout << BigInt("+11111111111111111111111111") << std::endl;
+	ASSERT_EQ(BigIntStream.str(), TestStream.str());
+	
+	std::cout.rdbuf(p_cout_streambuf);
+}
+
+TEST_F(TestBigInt, test_eq) {
+	ASSERT_TRUE(BigInt() == 0);
+	ASSERT_TRUE(BigInt(0) == 0);
+	ASSERT_TRUE(BigInt(+0) == 0);
+	ASSERT_TRUE(BigInt(1) == 1);
+	ASSERT_TRUE(BigInt(123123) == 123123);
+	ASSERT_TRUE(BigInt(-123123) == -123123);
+	ASSERT_TRUE(BigInt(2147483647) == 2147483647);
+	ASSERT_TRUE(BigInt(-2147483647) == -2147483647);
+	ASSERT_TRUE(BigInt(+2147483647) == 2147483647);
+	ASSERT_TRUE(BigInt("0") == 0);
+	ASSERT_TRUE(BigInt("-0") == 0);
+	ASSERT_TRUE(BigInt("+0") == 0);
+	ASSERT_TRUE(BigInt("1") == 1);
+	ASSERT_TRUE(BigInt("123123") == 123123);
+	ASSERT_TRUE(BigInt("-123123") == -123123);
+	ASSERT_TRUE(BigInt("2147483647") == 2147483647);
+	ASSERT_TRUE(BigInt("-2147483647") == -2147483647);
+	ASSERT_TRUE(BigInt("+2147483647") == 2147483647);
+	ASSERT_TRUE(BigInt("+2147483647") == 2147483647);
+	ASSERT_TRUE(BigInt("+1111111111112147483647") == std::string("1111111111112147483647"));
+	ASSERT_TRUE(BigInt("-1111111111112147483647") == std::string("-1111111111112147483647"));
+	ASSERT_TRUE(BigInt("1111111111112147483647") == std::string("1111111111112147483647"));
+	ASSERT_FALSE(BigInt() == 1);
+	ASSERT_FALSE(BigInt(0) == 1);
+	ASSERT_FALSE(BigInt(+0) == 1);
+	ASSERT_FALSE(BigInt(1) == 0);
+	ASSERT_FALSE(BigInt(123123) == 0);
+	ASSERT_FALSE(BigInt(-123123) == 0);
+	ASSERT_FALSE(BigInt(2147483647) == 0);
+	ASSERT_FALSE(BigInt(-2147483647) == 0);
+	ASSERT_FALSE(BigInt(+2147483647) == 0);
+	ASSERT_FALSE(BigInt("0") == 1);
+	ASSERT_FALSE(BigInt("-0") == 1);
+	ASSERT_FALSE(BigInt("+0") == 1);
+	ASSERT_FALSE(BigInt("1") == 0);
+	ASSERT_FALSE(BigInt("123123") == 0);
+	ASSERT_FALSE(BigInt("-123123") == 0);
+	ASSERT_FALSE(BigInt("2147483647") == 0);
+	ASSERT_FALSE(BigInt("-2147483647") == 0);
+	ASSERT_FALSE(BigInt("+2147483647") == 0);
+	ASSERT_FALSE(BigInt("+2147483647") == 0);
+	ASSERT_FALSE(BigInt("+1111111111112147483647") == 0);
+	ASSERT_FALSE(BigInt("-1111111111112147483647") == 0);
+	ASSERT_FALSE(BigInt("1111111111112147483647") == 0);
+}
+
+TEST_F(TestBigInt, test_ne) {
+	ASSERT_FALSE(BigInt() != 0);
+	ASSERT_FALSE(BigInt(0) != 0);
+	ASSERT_FALSE(BigInt(+0) != 0);
+	ASSERT_FALSE(BigInt(1) != 1);
+	ASSERT_FALSE(BigInt(123123) != 123123);
+	ASSERT_FALSE(BigInt(-123123) != -123123);
+	ASSERT_FALSE(BigInt(2147483647) != 2147483647);
+	ASSERT_FALSE(BigInt(-2147483647) != -2147483647);
+	ASSERT_FALSE(BigInt(+2147483647) != 2147483647);
+	ASSERT_FALSE(BigInt("0") != 0);
+	ASSERT_FALSE(BigInt("-0") != 0);
+	ASSERT_FALSE(BigInt("+0") != 0);
+	ASSERT_FALSE(BigInt("1") != 1);
+	ASSERT_FALSE(BigInt("123123") != 123123);
+	ASSERT_FALSE(BigInt("-123123") != -123123);
+	ASSERT_FALSE(BigInt("2147483647") != 2147483647);
+	ASSERT_FALSE(BigInt("-2147483647") != -2147483647);
+	ASSERT_FALSE(BigInt("+2147483647") != 2147483647);
+	ASSERT_FALSE(BigInt("+2147483647") != 2147483647);
+	ASSERT_FALSE(BigInt("+1111111111112147483647") != std::string("1111111111112147483647"));
+	ASSERT_FALSE(BigInt("-1111111111112147483647") != std::string("-1111111111112147483647"));
+	ASSERT_FALSE(BigInt("1111111111112147483647") != std::string("1111111111112147483647"));
+	ASSERT_TRUE(BigInt() != 1);
+	ASSERT_TRUE(BigInt(0) != 1);
+	ASSERT_TRUE(BigInt(+0) != 1);
+	ASSERT_TRUE(BigInt(1) != 0);
+	ASSERT_TRUE(BigInt(123123) != 0);
+	ASSERT_TRUE(BigInt(-123123) != 0);
+	ASSERT_TRUE(BigInt(2147483647) != 0);
+	ASSERT_TRUE(BigInt(-2147483647) != 0);
+	ASSERT_TRUE(BigInt(+2147483647) != 0);
+	ASSERT_TRUE(BigInt("0") != 1);
+	ASSERT_TRUE(BigInt("-0") != 1);
+	ASSERT_TRUE(BigInt("+0") != 1);
+	ASSERT_TRUE(BigInt("1") != 0);
+	ASSERT_TRUE(BigInt("123123") != 0);
+	ASSERT_TRUE(BigInt("-123123") != 0);
+	ASSERT_TRUE(BigInt("2147483647") != 0);
+	ASSERT_TRUE(BigInt("-2147483647") != 0);
+	ASSERT_TRUE(BigInt("+2147483647") != 0);
+	ASSERT_TRUE(BigInt("+2147483647") != 0);
+	ASSERT_TRUE(BigInt("+1111111111112147483647") != 0);
+	ASSERT_TRUE(BigInt("-1111111111112147483647") != 0);
+	ASSERT_TRUE(BigInt("1111111111112147483647") != 0);
+}
+
+TEST_F(TestBigInt, test_lt) {
+	ASSERT_FALSE(BigInt() < -1);
+	ASSERT_FALSE(BigInt(0) < -1);
+	ASSERT_FALSE(BigInt(+0) < -1);
+	ASSERT_FALSE(BigInt(1) < 0);
+	ASSERT_FALSE(BigInt(123123) < 123122);
+	ASSERT_FALSE(BigInt(-123123) < -123124);
+	ASSERT_FALSE(BigInt(2147483647) < std::string("2147483646"));
+	ASSERT_FALSE(BigInt(-2147483646) < -2147483647);
+	ASSERT_FALSE(BigInt(+2147483647) < std::string("2147483646"));
+	ASSERT_FALSE(BigInt("0") < 0);
+	ASSERT_FALSE(BigInt("-0") < 0);
+	ASSERT_FALSE(BigInt("+0") < 0);
+	ASSERT_FALSE(BigInt("1") < 0);
+	ASSERT_FALSE(BigInt("123123") < 123122);
+	ASSERT_FALSE(BigInt("-123123") < -123124);
+	ASSERT_FALSE(BigInt("2147483647") < std::string("2147483646"));
+	ASSERT_FALSE(BigInt("-2147483646") < -2147483647);
+	ASSERT_FALSE(BigInt("+2147483647") < std::string("2147483646"));
+	ASSERT_FALSE(BigInt("+1111111111112147483647") < std::string("1111111111112147483646"));
+	ASSERT_FALSE(BigInt("-1111111111112147483647") < std::string("-1111111111112147483648"));
+	ASSERT_FALSE(BigInt("1111111111112147483647") < std::string("1111111111112147483646"));
+	ASSERT_TRUE(BigInt() < 1);
+	ASSERT_TRUE(BigInt(0) < 1);
+	ASSERT_TRUE(BigInt(+0) < 1);
+	ASSERT_TRUE(BigInt(1) < 2);
+	ASSERT_TRUE(BigInt(123123) < 123124);
+	ASSERT_TRUE(BigInt(-123123) < -123122);
+	ASSERT_TRUE(BigInt(2147483646) < 2147483647);
+	ASSERT_TRUE(BigInt(-2147483647) < -2147483646);
+	ASSERT_TRUE(BigInt(+2147483646) < 2147483647);
+	ASSERT_TRUE(BigInt("0") < 1);
+	ASSERT_TRUE(BigInt("-0") < 1);
+	ASSERT_TRUE(BigInt("+0") < 1);
+	ASSERT_TRUE(BigInt("1") < 2);
+	ASSERT_TRUE(BigInt("123123") < 123124);
+	ASSERT_TRUE(BigInt("-123123") < -123122);
+	ASSERT_TRUE(BigInt("2147483646") < 2147483647);
+	ASSERT_TRUE(BigInt("-2147483647") < -2147483646);
+	ASSERT_TRUE(BigInt("+2147483646") < 2147483647);
+	ASSERT_TRUE(BigInt("+2147483646") < 2147483647);
+	ASSERT_TRUE(BigInt("+1111111111112147483647") < std::string("1111111111112147483648"));
+	ASSERT_TRUE(BigInt("-1111111111112147483647") < std::string("-1111111111112147483646"));
+	ASSERT_TRUE(BigInt("1111111111112147483647") < std::string("1111111111112147483648"));
+}
+
+TEST_F(TestBigInt, test_le) {
+	ASSERT_FALSE(BigInt() <= -1);
+	ASSERT_FALSE(BigInt(0) <= -1);
+	ASSERT_FALSE(BigInt(+0) <= -1);
+	ASSERT_FALSE(BigInt(1) <= 0);
+	ASSERT_FALSE(BigInt(123123) <= 123122);
+	ASSERT_FALSE(BigInt(-123123) <= -123124);
+	ASSERT_FALSE(BigInt(2147483647) <= 2147483646);
+	ASSERT_FALSE(BigInt(-2147483646) <= -2147483647);
+	ASSERT_FALSE(BigInt(+2147483647) <= 2147483646);
+	ASSERT_FALSE(BigInt("0") <= -1);
+	ASSERT_FALSE(BigInt("-0") <= -1);
+	ASSERT_FALSE(BigInt("+0") <= -1);
+	ASSERT_FALSE(BigInt("1") <= 0);
+	ASSERT_FALSE(BigInt("123123") <= 123122);
+	ASSERT_FALSE(BigInt("-123123") <= -123124);
+	ASSERT_FALSE(BigInt("2147483647") <= 2147483646);
+	ASSERT_FALSE(BigInt("-2147483646") <= -2147483647);
+	ASSERT_FALSE(BigInt("+2147483647") <= 2147483646);
+	ASSERT_FALSE(BigInt("+1111111111112147483647") <= std::string("1111111111112147483646"));
+	ASSERT_FALSE(BigInt("-1111111111112147483647") <= std::string("-1111111111112147483648"));
+	ASSERT_FALSE(BigInt("1111111111112147483647") <= std::string("1111111111112147483646"));
+	ASSERT_TRUE(BigInt() <= 1);
+	ASSERT_TRUE(BigInt(0) <= 1);
+	ASSERT_TRUE(BigInt(+0) <= 1);
+	ASSERT_TRUE(BigInt(1) <= 2);
+	ASSERT_TRUE(BigInt(123123) <= 123124);
+	ASSERT_TRUE(BigInt(-123123) <= -123122);
+	ASSERT_TRUE(BigInt(2147483647) <= std::string("2147483648"));
+	ASSERT_TRUE(BigInt(-2147483647) <= -2147483646);
+	ASSERT_TRUE(BigInt(+2147483647) <= std::string("2147483648"));
+	ASSERT_TRUE(BigInt("0") <= 1);
+	ASSERT_TRUE(BigInt("-0") <= 1);
+	ASSERT_TRUE(BigInt("+0") <= 1);
+	ASSERT_TRUE(BigInt("1") <= 2);
+	ASSERT_TRUE(BigInt("123123") <= 123124);
+	ASSERT_TRUE(BigInt("-123123") <= -123122);
+	ASSERT_TRUE(BigInt("2147483647") <= std::string("2147483648"));
+	ASSERT_TRUE(BigInt("-2147483647") <= 2147483646);
+	ASSERT_TRUE(BigInt("+2147483647") <= std::string("2147483648"));
+	ASSERT_TRUE(BigInt("+2147483647") <= std::string("2147483648"));
+	ASSERT_TRUE(BigInt("+1111111111112147483647") <= std::string("1111111111112147483648"));
+	ASSERT_TRUE(BigInt("-1111111111112147483647") <= std::string("-1111111111112147483646"));
+	ASSERT_TRUE(BigInt("1111111111112147483647") <= std::string("1111111111112147483648"));
+	ASSERT_TRUE(BigInt() <= 0);
+	ASSERT_TRUE(BigInt(0) <= 0);
+	ASSERT_TRUE(BigInt(+0) <= 0);
+	ASSERT_TRUE(BigInt(1) <= 1);
+	ASSERT_TRUE(BigInt(123123) <= 123123);
+	ASSERT_TRUE(BigInt(-123123) <= -123123);
+	ASSERT_TRUE(BigInt(2147483647) <= 2147483647);
+	ASSERT_TRUE(BigInt(-2147483647) <= -2147483647);
+	ASSERT_TRUE(BigInt(+2147483647) <= 2147483647);
+	ASSERT_TRUE(BigInt("0") <= 0);
+	ASSERT_TRUE(BigInt("-0") <= 0);
+	ASSERT_TRUE(BigInt("+0") <= 0);
+	ASSERT_TRUE(BigInt("1") <= 1);
+	ASSERT_TRUE(BigInt("123123") <= 123123);
+	ASSERT_TRUE(BigInt("-123123") <= -123123);
+	ASSERT_TRUE(BigInt("2147483647") <= 2147483647);
+	ASSERT_TRUE(BigInt("-2147483647") <= -2147483647);
+	ASSERT_TRUE(BigInt("+2147483647") <= 2147483647);
+	ASSERT_TRUE(BigInt("+2147483647") <= 2147483647);
+	ASSERT_TRUE(BigInt("+1111111111112147483647") <= std::string("1111111111112147483647"));
+	ASSERT_TRUE(BigInt("-1111111111112147483647") <= std::string("-1111111111112147483647"));
+	ASSERT_TRUE(BigInt("1111111111112147483647") <= std::string("1111111111112147483647"));
+}
+
+TEST_F(TestBigInt, test_gt) {
+	ASSERT_FALSE(BigInt() > 0);
+	ASSERT_FALSE(BigInt(0) > 0);
+	ASSERT_FALSE(BigInt(+0) > 0);
+	ASSERT_FALSE(BigInt(1) > 1);
+	ASSERT_FALSE(BigInt(123123) > 123123);
+	ASSERT_FALSE(BigInt(-123123) > -123123);
+	ASSERT_FALSE(BigInt(2147483647) > 2147483647);
+	ASSERT_FALSE(BigInt(-2147483647) > -2147483647);
+	ASSERT_FALSE(BigInt(+2147483647) > 2147483647);
+	ASSERT_FALSE(BigInt("0") > 0);
+	ASSERT_FALSE(BigInt("-0") > 0);
+	ASSERT_FALSE(BigInt("+0") > 0);
+	ASSERT_FALSE(BigInt("1") > 1);
+	ASSERT_FALSE(BigInt("123123") > 123123);
+	ASSERT_FALSE(BigInt("-123123") > -123123);
+	ASSERT_FALSE(BigInt("2147483647") > 2147483647);
+	ASSERT_FALSE(BigInt("-2147483647") > -2147483647);
+	ASSERT_FALSE(BigInt("+2147483647") > 2147483647);
+	ASSERT_FALSE(BigInt("+2147483647") > 2147483647);
+	ASSERT_FALSE(BigInt("+1111111111112147483647") > std::string("1111111111112147483647"));
+	ASSERT_FALSE(BigInt("-1111111111112147483647") > std::string("-1111111111112147483647"));
+	ASSERT_FALSE(BigInt("1111111111112147483647") > std::string("1111111111112147483647"));
+	ASSERT_TRUE(BigInt() > -1);
+	ASSERT_TRUE(BigInt(0) > -1);
+	ASSERT_TRUE(BigInt(+0) > -1);
+	ASSERT_TRUE(BigInt(1) > 0);
+	ASSERT_TRUE(BigInt(123123) > 123122);
+	ASSERT_TRUE(BigInt(-123123) > -123124);
+	ASSERT_TRUE(BigInt(2147483647) > 2147483646);
+	ASSERT_TRUE(BigInt(-2147483646) > -2147483647);
+	ASSERT_TRUE(BigInt(+2147483647) > 2147483646);
+	ASSERT_TRUE(BigInt("0") > -1);
+	ASSERT_TRUE(BigInt("-0") > -1);
+	ASSERT_TRUE(BigInt("+0") > -1);
+	ASSERT_TRUE(BigInt("1") > 0);
+	ASSERT_TRUE(BigInt("123123") > 123122);
+	ASSERT_TRUE(BigInt("-123123") > -123124);
+	ASSERT_TRUE(BigInt("2147483647") > 2147483646);
+	ASSERT_TRUE(BigInt("-2147483646") > -2147483647);
+	ASSERT_TRUE(BigInt("+2147483647") > 2147483646);
+	ASSERT_TRUE(BigInt("+2147483647") > 2147483646);
+	ASSERT_TRUE(BigInt("+1111111111112147483647") > std::string("1111111111112147483646"));
+	ASSERT_TRUE(BigInt("-1111111111112147483647") > std::string("-1111111111112147483648"));
+	ASSERT_TRUE(BigInt("1111111111112147483647") > std::string("1111111111112147483646"));
+}
+
+TEST_F(TestBigInt, test_ge) {
+ASSERT_FALSE(BigInt() >= 1);
+ASSERT_FALSE(BigInt(0) >= 1);
+ASSERT_FALSE(BigInt(+0) >= 1);
+ASSERT_FALSE(BigInt(1) >= 2);
+ASSERT_FALSE(BigInt(123123) >= 123124);
+ASSERT_FALSE(BigInt(-123123) >= -123122);
+ASSERT_FALSE(BigInt(2147483646) >= 2147483647);
+ASSERT_FALSE(BigInt(-2147483647) >= -2147483646);
+ASSERT_FALSE(BigInt(+2147483646) >= 2147483647);
+ASSERT_FALSE(BigInt("0") >= 1);
+ASSERT_FALSE(BigInt("-0") >= 1);
+ASSERT_FALSE(BigInt("+0") >= 1);
+ASSERT_FALSE(BigInt("1") >= 2);
+ASSERT_FALSE(BigInt("123123") >= 123124);
+ASSERT_FALSE(BigInt("-123123") >= -123122);
+ASSERT_FALSE(BigInt("2147483646") >= 2147483647);
+ASSERT_FALSE(BigInt("-2147483647") >= -2147483646);
+ASSERT_FALSE(BigInt("+2147483646") >= 2147483647);
+ASSERT_FALSE(BigInt("+1111111111112147483647") >= std::string("1111111111112147483648"));
+ASSERT_FALSE(BigInt("-1111111111112147483647") >= std::string("-1111111111112147483646"));
+ASSERT_FALSE(BigInt("1111111111112147483647") >= std::string("1111111111112147483648"));
+ASSERT_TRUE(BigInt() >= -1);
+ASSERT_TRUE(BigInt(0) >= -1);
+ASSERT_TRUE(BigInt(+0) >= -1);
+ASSERT_TRUE(BigInt(1) >= 0);
+ASSERT_TRUE(BigInt(123123) >= 123122);
+ASSERT_TRUE(BigInt(-123123) >= -123124);
+ASSERT_TRUE(BigInt(2147483647) >= std::string("2147483646"));
+ASSERT_TRUE(BigInt(-2147483646) >= -2147483647);
+ASSERT_TRUE(BigInt(+2147483647) >= std::string("2147483646"));
+ASSERT_TRUE(BigInt("0") >= -1);
+ASSERT_TRUE(BigInt("-0") >= -1);
+ASSERT_TRUE(BigInt("+0") >= -1);
+ASSERT_TRUE(BigInt("1") >= 0);
+ASSERT_TRUE(BigInt("123123") >= 123122);
+ASSERT_TRUE(BigInt("-123123") >= -123124);
+ASSERT_TRUE(BigInt("2147483647") >= std::string("2147483646"));
+ASSERT_TRUE(BigInt("-2147483646") >= -2147483647);
+ASSERT_TRUE(BigInt("+2147483647") >= std::string("2147483646"));
+ASSERT_TRUE(BigInt("+2147483647") >= std::string("2147483646"));
+ASSERT_TRUE(BigInt("+1111111111112147483647") >= std::string("1111111111112147483646"));
+ASSERT_TRUE(BigInt("-1111111111112147483646") >= std::string("-1111111111112147483647"));
+ASSERT_TRUE(BigInt("1111111111112147483647") >= std::string("1111111111112147483646"));
+ASSERT_TRUE(BigInt() >= 0);
+ASSERT_TRUE(BigInt(0) >= 0);
+ASSERT_TRUE(BigInt(+0) >= 0);
+ASSERT_TRUE(BigInt(1) >= 1);
+ASSERT_TRUE(BigInt(123123) >= 123123);
+ASSERT_TRUE(BigInt(-123123) >= -123123);
+ASSERT_TRUE(BigInt(2147483647) >= 2147483647);
+ASSERT_TRUE(BigInt(-2147483647) >= -2147483647);
+ASSERT_TRUE(BigInt(+2147483647) >= 2147483647);
+ASSERT_TRUE(BigInt("0") >= 0);
+ASSERT_TRUE(BigInt("-0") >= 0);
+ASSERT_TRUE(BigInt("+0") >= 0);
+ASSERT_TRUE(BigInt("1") >= 1);
+ASSERT_TRUE(BigInt("123123") >= 123123);
+ASSERT_TRUE(BigInt("-123123") >= -123123);
+ASSERT_TRUE(BigInt("2147483647") >= 2147483647);
+ASSERT_TRUE(BigInt("-2147483647") >= -2147483647);
+ASSERT_TRUE(BigInt("+2147483647") >= 2147483647);
+ASSERT_TRUE(BigInt("+2147483647") >= 2147483647);
+ASSERT_TRUE(BigInt("+1111111111112147483647") >= std::string("1111111111112147483647"));
+ASSERT_TRUE(BigInt("-1111111111112147483647") >= std::string("-1111111111112147483647"));
+ASSERT_TRUE(BigInt("1111111111112147483647") >= std::string("1111111111112147483647"));
+}
+
+TEST_F(TestBigInt, test_sub_big_int) {
+	ASSERT_EQ(BigInt(), BigInt() - BigInt());
+	ASSERT_EQ(BigInt(0), BigInt() - BigInt());
+	ASSERT_EQ(BigInt(0), BigInt(0) - BigInt());
+	ASSERT_EQ(BigInt(0), BigInt(0) - BigInt(0));
+	ASSERT_EQ(BigInt(1), BigInt(1) - BigInt());
+	ASSERT_EQ(BigInt(0), BigInt(1) - BigInt(1));
+	ASSERT_EQ(BigInt(8), BigInt(10) - BigInt(2));
+	ASSERT_EQ(BigInt(), BigInt() - BigInt(0));
+	ASSERT_EQ(BigInt(-123123), BigInt() - BigInt(123123));
+	ASSERT_EQ(BigInt(0), BigInt("123123123123123") - BigInt("123123123123123"));
+	ASSERT_EQ(BigInt("0"), BigInt("2147483647") - BigInt("2147483647"));
+	ASSERT_EQ(BigInt("-2147483647"), BigInt("0") - BigInt("2147483647"));
+	ASSERT_EQ(BigInt("2147483647"), BigInt("2147483647") - BigInt("0"));
+	ASSERT_EQ(BigInt("0"), BigInt("2147483648") - BigInt("2147483648"));
+	ASSERT_EQ(BigInt("-2147483648"), BigInt("0") - BigInt("2147483648"));
+	ASSERT_EQ(BigInt("2147483648"), BigInt("2147483648") - BigInt("0"));
+	ASSERT_EQ(BigInt("2222222222222220"), BigInt("2222222222222222") - BigInt("2"));
+	ASSERT_EQ(BigInt("0"), BigInt("-2222222222222222") - BigInt("-2222222222222222"));
+	ASSERT_EQ(BigInt("-4444444444444444"), BigInt("-2222222222222222") - BigInt("2222222222222222"));
+	ASSERT_EQ(BigInt("4444444444444444"), BigInt("2222222222222222") - BigInt("-2222222222222222"));
+	ASSERT_EQ(BigInt("99999999999999999999999999"), BigInt("100000000000000000000000000") - BigInt("1"));
+}
+
+TEST_F(TestBigInt, test_sub_int_r) {
+	ASSERT_EQ(BigInt(), BigInt() - 0);
+	ASSERT_EQ(BigInt(0), BigInt() - 0);
+	ASSERT_EQ(BigInt(0), BigInt(0) - 0);
+	ASSERT_EQ(BigInt(0), BigInt(0) - 0);
+	ASSERT_EQ(BigInt(1), BigInt(1) - 0);
+	ASSERT_EQ(BigInt(0), BigInt(1) - 1);
+	ASSERT_EQ(BigInt(8), BigInt(10) - 2);
+	ASSERT_EQ(BigInt(), BigInt() - 0);
+	ASSERT_EQ(BigInt(-123123), BigInt() - 123123);
+	ASSERT_EQ(BigInt("0"), BigInt("2147483647") - 2147483647);
+	ASSERT_EQ(BigInt("-2147483647"), BigInt("0") - 2147483647);
+	ASSERT_EQ(BigInt("2147483647"), BigInt("2147483647") - 0);
+	ASSERT_EQ(BigInt("2147483648"), BigInt("2147483648") - 0);
+	ASSERT_EQ(BigInt("2222222222222220"), BigInt("2222222222222222") - 2);
+}
+
+TEST_F(TestBigInt, test_add_big_int) {
+	ASSERT_EQ(BigInt(), BigInt() + BigInt());
+	ASSERT_EQ(BigInt(0), BigInt() + BigInt());
+	ASSERT_EQ(BigInt(0), BigInt(0) + BigInt());
+	ASSERT_EQ(BigInt(0), BigInt(0) + BigInt(0));
+	ASSERT_EQ(BigInt(1), BigInt(1) + BigInt());
+	ASSERT_EQ(BigInt(2), BigInt(1) + BigInt(1));
+	ASSERT_EQ(BigInt(10), BigInt(5) + BigInt(5));
+	ASSERT_EQ(BigInt(12), BigInt(10) + BigInt(2));
+	ASSERT_EQ(BigInt(), BigInt() + BigInt(0));
+	ASSERT_EQ(BigInt(123123), BigInt() + BigInt(123123));
+	ASSERT_EQ(BigInt(-123123), BigInt() + BigInt(-123123));
+	ASSERT_EQ(BigInt("246246246246246"), BigInt("123123123123123") + BigInt("123123123123123"));
+	ASSERT_EQ(BigInt("4294967294"), BigInt("2147483647") + BigInt("2147483647"));
+	ASSERT_EQ(BigInt("2147483647"), BigInt("0") + BigInt("2147483647"));
+	ASSERT_EQ(BigInt("2147483647"), BigInt("2147483647") + BigInt("0"));
+	ASSERT_EQ(BigInt("4294967296"), BigInt("2147483648") + BigInt("2147483648"));
+	ASSERT_EQ(BigInt("2147483648"), BigInt("0") + BigInt("2147483648"));
+	ASSERT_EQ(BigInt("2147483648"), BigInt("2147483648") + BigInt("0"));
+	ASSERT_EQ(BigInt("2222222222222224"), BigInt("2222222222222222") + BigInt("2"));
+	ASSERT_EQ(BigInt("4444444444444444"), BigInt("2222222222222222") + BigInt("2222222222222222"));
+	ASSERT_EQ(BigInt("1111112111111110"), BigInt("999999999") + BigInt("1111111111111111"));
+	ASSERT_EQ(BigInt("1000"), BigInt("999") + BigInt("1"));
+	ASSERT_EQ(BigInt("-4444444444444444"), BigInt("-2222222222222222") + BigInt("-2222222222222222"));
+	ASSERT_EQ(BigInt("0"), BigInt("-2222222222222222") + BigInt("2222222222222222"));
+	ASSERT_EQ(BigInt("0"), BigInt("2222222222222222") + BigInt("-2222222222222222"));
+	ASSERT_EQ(BigInt("100000000000000000000000000000"), BigInt("99999999999999999999999999999") + BigInt("1"));
+}
+
+TEST_F(TestBigInt, test_add_int_r) {
+	ASSERT_EQ(BigInt(), BigInt() + 0);
+	ASSERT_EQ(BigInt(0), BigInt() + 0);
+	ASSERT_EQ(BigInt(0), BigInt(0) + 0);
+	ASSERT_EQ(BigInt(0), BigInt(0) + 0);
+	ASSERT_EQ(BigInt(1), BigInt(1) + 0);
+	ASSERT_EQ(BigInt(2), BigInt(1) + 1);
+	ASSERT_EQ(BigInt(12), BigInt(10) + 2);
+	ASSERT_EQ(BigInt(), BigInt() + BigInt(0));
+	ASSERT_EQ(BigInt(123123), BigInt() + 123123);
+	ASSERT_EQ(BigInt(-123123), BigInt() + -123123);
+	ASSERT_EQ(BigInt("4294967294"), BigInt("2147483647") + 2147483647);
+	ASSERT_EQ(BigInt("2147483647"), BigInt("0") + 2147483647);
+	ASSERT_EQ(BigInt("2147483647"), BigInt("2147483647") + 0);
+	ASSERT_EQ(BigInt("4294967295"), BigInt("2147483648") + 2147483647);
+	ASSERT_EQ(BigInt("2147483648"), BigInt("2147483648") + 0);
+	ASSERT_EQ(BigInt("2222222222222224"), BigInt("2222222222222222") + 2);
+	ASSERT_EQ(BigInt("2222222222224222"), BigInt("2222222222222222") + 2000);
+	ASSERT_EQ(BigInt("-2222222222224222"), BigInt("-2222222222222222") + -2000);
+	ASSERT_EQ(BigInt("-2222222222220222"), BigInt("-2222222222222222") + 2000);
+	ASSERT_EQ(BigInt("2222222222220222"), BigInt("2222222222222222") + -2000);
+ASSERT_EQ(BigInt("100000000000000000000000000000"), BigInt("99999999999999999999999999999") + 1);
+}
+
+TEST_F(TestBigInt, test_add_int_l) {
+	ASSERT_EQ(BigInt(), BigInt() + 0);
+	ASSERT_EQ(BigInt(0), BigInt() + 0);
+	ASSERT_EQ(BigInt(0), BigInt(0) + 0);
+	ASSERT_EQ(BigInt(0), BigInt(0) + 0);
+	ASSERT_EQ(BigInt(1), BigInt(1) + 0);
+	ASSERT_EQ(BigInt(2), BigInt(1) + 1);
+	ASSERT_EQ(BigInt(10), BigInt(5) + 5);
+	ASSERT_EQ(BigInt(12), BigInt(10) + 2);
+	ASSERT_EQ(BigInt(), BigInt() + 0);
+	ASSERT_EQ(BigInt(123123), BigInt() + 123123);
+	ASSERT_EQ(BigInt(-123123), BigInt() + -123123);
+	ASSERT_EQ(BigInt("4294967294"), BigInt("2147483647") + 2147483647);
+	ASSERT_EQ(BigInt("2147483647"), BigInt("0") + 2147483647);
+	ASSERT_EQ(BigInt("2147483647"), BigInt("2147483647") + 0);
+	ASSERT_EQ(BigInt("2147483648"), BigInt("2147483648") + 0);
+	ASSERT_EQ(BigInt("2222222222222224"), BigInt("2222222222222222") + 2);
+	ASSERT_EQ(BigInt("1000"), BigInt("999") + 1);
+	ASSERT_EQ(BigInt("-2222222222224444"), BigInt("-2222222222222222") +(-2222));
+	ASSERT_EQ(BigInt("-2222222222200000"), BigInt("-2222222222222222") + 22222);
+	ASSERT_EQ(BigInt("2222222222200000"), BigInt("2222222222222222") + (-22222));
+	ASSERT_EQ(BigInt("100000000000000000000000000000"), BigInt("99999999999999999999999999999") + 1);
+}
+
+TEST_F(TestBigInt, test_mul_big_int) {
+	ASSERT_EQ(BigInt(), BigInt() * BigInt());
+	ASSERT_EQ(BigInt(), BigInt(0) * BigInt());
+	ASSERT_EQ(BigInt(0), BigInt(0) * BigInt());
+	ASSERT_EQ(BigInt(0), BigInt(0) * BigInt(0));
+	ASSERT_EQ(BigInt(0), BigInt(1) * BigInt());
+	ASSERT_EQ(BigInt(0), BigInt() * BigInt(1));
+	ASSERT_EQ(BigInt(), BigInt(-1) * BigInt());
+	ASSERT_EQ(BigInt(), BigInt() * BigInt(-1));
+	ASSERT_EQ(BigInt(1), BigInt(1) * BigInt(1));
+	ASSERT_EQ(BigInt(-1), BigInt(-1) * BigInt(1));
+	ASSERT_EQ(BigInt(-1), BigInt(1) * BigInt(-1));
+	ASSERT_EQ(BigInt(1), BigInt(-1) * BigInt(-1));
+	ASSERT_EQ(BigInt(15129), BigInt(123) * BigInt(123));
+	ASSERT_EQ(BigInt(), BigInt(123) * BigInt());
+	ASSERT_EQ(BigInt(), BigInt() * BigInt(123));
+	ASSERT_EQ(BigInt(), BigInt(-123) * BigInt());
+	ASSERT_EQ(BigInt(), BigInt() * BigInt(-123));
+	ASSERT_EQ(BigInt(-15129), BigInt(123) * BigInt(-123));
+	ASSERT_EQ(BigInt(-15129), BigInt(-123) * BigInt(123));
+	ASSERT_EQ(BigInt(15129), BigInt(-123) * BigInt(-123));
+	ASSERT_EQ(BigInt("1111111111111111111"), BigInt("1111111111111111111") * BigInt(1));
+	ASSERT_EQ(BigInt("-1111111111111111111"), BigInt("-1111111111111111111") * BigInt(1));
+	ASSERT_EQ(BigInt("-1111111111111111111"), BigInt("1111111111111111111") * BigInt(-1));
+	ASSERT_EQ(BigInt("288396504612720540486378270162054"), BigInt("1231231231231231231") * BigInt("234234234234234"));
+	ASSERT_EQ(BigInt("-288396504612720540486378270162054"), BigInt("-1231231231231231231") * BigInt("234234234234234"));
+	ASSERT_EQ(BigInt("-288396504612720540486378270162054"), BigInt("1231231231231231231") * BigInt("-234234234234234"));
+	ASSERT_EQ(BigInt("288396504612720540486378270162054"), BigInt("-1231231231231231231") * BigInt("-234234234234234"));
+}
+
+TEST_F(TestBigInt, test_mul_int_r) {
+	ASSERT_EQ(BigInt(), BigInt() * 0);
+	ASSERT_EQ(BigInt(), BigInt(0) * 0);
+	ASSERT_EQ(BigInt(0), BigInt(0) * 0);
+	ASSERT_EQ(BigInt(0), BigInt(0) * 0);
+	ASSERT_EQ(BigInt(0), BigInt(1) * 0);
+	ASSERT_EQ(BigInt(0), BigInt() * 1);
+	ASSERT_EQ(BigInt(), BigInt(-1) * 0);
+	ASSERT_EQ(BigInt(), BigInt() * (-1));
+	ASSERT_EQ(BigInt(1), BigInt(1) * 1);
+	ASSERT_EQ(BigInt(-1), BigInt(-1) * 1);
+	ASSERT_EQ(BigInt(-1), BigInt(1) * (-1));
+	ASSERT_EQ(BigInt(1), BigInt(-1) * (-1));
+	ASSERT_EQ(BigInt(15129), BigInt(123) * 123);
+	ASSERT_EQ(BigInt(), BigInt(123) * 0);
+	ASSERT_EQ(BigInt(), BigInt() * 123);
+	ASSERT_EQ(BigInt(), BigInt(-123) * 0);
+	ASSERT_EQ(BigInt(), BigInt() * (-123));
+	ASSERT_EQ(BigInt(-15129), BigInt(123) * (-123));
+	ASSERT_EQ(BigInt(-15129), BigInt(-123) * 123);
+	ASSERT_EQ(BigInt(15129), BigInt(-123) * (-123));
+	ASSERT_EQ(BigInt("1111111111111111111"), BigInt("1111111111111111111") * 1);
+	ASSERT_EQ(BigInt("-1111111111111111111"), BigInt("-1111111111111111111") * 1);
+	ASSERT_EQ(BigInt("-1111111111111111111"), BigInt("1111111111111111111") * (-1));
+}
+
+int main(int argc, char *argv[]) {
+	::testing::InitGoogleTest(&argc, argv);
+	return RUN_ALL_TESTS();
+}
