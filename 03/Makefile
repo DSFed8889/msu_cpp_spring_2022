@@ -17,4 +17,4 @@ main: main_bin
 	valgrind ./main_bin
 
 test: test_bin
-	./test_bin
+	valgrind ./test_bin

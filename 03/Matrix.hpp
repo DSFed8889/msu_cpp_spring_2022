@@ -11,12 +11,12 @@ namespace matrix {
 		class ProxyRow {
 		private:
 			int32_t *data_ = nullptr;
-			size_t columns_count_;
+			int64_t columns_count_;
 		public:
-			explicit ProxyRow(size_t);
+			explicit ProxyRow(int64_t);
 			ProxyRow(const ProxyRow &);
 			~ProxyRow();
-			int32_t &operator[](size_t) const;
+			int32_t &operator[](int64_t) const;
 			ProxyRow& operator=(const ProxyRow&);
 			ProxyRow operator+(const ProxyRow&);
 			ProxyRow& operator+=(const ProxyRow&);
@@ -25,12 +25,12 @@ namespace matrix {
 			friend std::ostream& operator<<(std::ostream& out, const ProxyRow& row);
 		};
 		Matrix& operator=(const Matrix&);
-		Matrix(size_t, size_t);
+		Matrix(int64_t, int64_t);
 		Matrix(const Matrix&);
 		~Matrix();
-		[[nodiscard]] size_t getRows() const;
-		[[nodiscard]] size_t getColumns() const;
-		ProxyRow &operator[](size_t) const;
+		[[nodiscard]] int64_t getRows() const;
+		[[nodiscard]] int64_t getColumns() const;
+		ProxyRow &operator[](int64_t) const;
 		Matrix operator+(const Matrix&);
 		Matrix& operator+=(const Matrix&);
 		Matrix& operator*=(int32_t);
@@ -38,9 +38,9 @@ namespace matrix {
 		bool operator!=(const Matrix&);
 		friend std::ostream& operator<<(std::ostream& out, const Matrix& matr);
 	private:
-		size_t Max_size = 1000000000ull;
-		size_t rows_count_;
-		size_t columns_count_;
+		int64_t Max_size = 1000000000ull;
+		int64_t rows_count_;
+		int64_t columns_count_;
 		ProxyRow *rows_ = nullptr;
 	};
 	std::ostream& operator<<(std::ostream& out, const Matrix::ProxyRow& row);
