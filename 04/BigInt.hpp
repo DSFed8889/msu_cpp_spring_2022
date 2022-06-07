@@ -27,18 +27,18 @@ namespace big_int {
 		BigInt& operator=(BigInt&&);
 		BigInt operator+(const BigInt&) const;
 		BigInt operator+(const int32_t&) const;
-		friend BigInt operator+(const int32_t&, const BigInt&);
+//		friend BigInt operator+(const int32_t&, const BigInt&);
 		BigInt operator-() const;
 		BigInt operator-(const BigInt&) const;
 		BigInt operator-(const int32_t&) const;
-		friend BigInt operator-(const int32_t&, const BigInt&);
+//		friend BigInt operator-(const int32_t&, const BigInt&);
 		BigInt operator*(const BigInt&) const;
 		BigInt operator*(const int32_t&) const;
-		friend BigInt operator*(const int32_t&, const BigInt&);
+//		friend BigInt operator*(const int32_t&, const BigInt&);
 		friend std::ostream& operator<<(std::ostream&,const BigInt&);
 	};
-	BigInt operator + (const int32_t&, const BigInt&);
-	BigInt operator - (const int32_t&, const BigInt&);
-	BigInt operator * (const int32_t&, const BigInt&);
+//	BigInt operator + (const int32_t&, const BigInt&);
+//	BigInt operator - (const int32_t&, const BigInt&);
+//	BigInt operator * (const int32_t&, const BigInt&);
 	std::ostream& operator << (std::ostream&,const BigInt&);
 }

@@ -59,9 +59,8 @@ BigInt::BigInt(BigInt &&num) {
 	size = num.size;
 	delete[] data;
 	data = num.data;
-	num.data = new char[1];
-	num.data[0] = 0;
-	num.size = 1;
+	num.data = nullptr;
+	num.size = 0;
 	num.sign = '+';
 }
 
@@ -81,16 +80,14 @@ BigInt &BigInt::operator=(const BigInt &num) {
 }
 
 BigInt &BigInt::operator=(BigInt &&num) {
-	//std::cout << "Yeahuuu!" << std::endl;
 	if (this == &num)
 		return *this;
 	sign = num.sign;
 	size = num.size;
 	delete[] data;
 	data = num.data;
-	num.data = new char[1];
-	num.data[0] = 0;
-	num.size = 1;
+	num.data = nullptr;
+	num.size = 0;
 	num.sign = '+';
 	return *this;
 }
@@ -138,9 +135,9 @@ BigInt BigInt::operator+(const int32_t &num) const{
 	return (*this) + BigInt(num);
 }
 
-BigInt big_int::operator+(const int32_t &num1, const BigInt &num2) {
-	return BigInt(num1) + num2;
-}
+//BigInt operator+(const int32_t &num1, const BigInt &num2) {
+//	return BigInt(num1) + num2;
+//}
 
 BigInt BigInt::operator-(const BigInt &num) const{
 	if (sign == num.sign) {
@@ -247,9 +244,9 @@ BigInt BigInt::operator-() const{
 	return result;
 }
 
-BigInt operator-(const int32_t &num1, const BigInt &num2) {
-	return BigInt(num1) - num2;
-}
+//BigInt operator-(const int32_t &num1, const BigInt &num2) {
+//	return BigInt(num1) - num2;
+//}
 
 BigInt BigInt::operator*(const BigInt &num) const{
 	BigInt result;
@@ -280,9 +277,9 @@ BigInt BigInt::operator*(const int32_t &num) const{
 	return (*this) * BigInt(num);
 }
 
-BigInt operator*(const int32_t &num1, const BigInt &num2) {
-	return BigInt(num1) * num2;
-}
+//BigInt operator*(const int32_t &num1, const BigInt &num2) {
+//	return BigInt(num1) * num2;
+//}
 
 std::ostream &big_int::operator<<(std::ostream &out, const BigInt &num) {
 	if (num.sign == '-')
