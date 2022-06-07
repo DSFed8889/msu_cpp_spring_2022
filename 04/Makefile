@@ -6,6 +6,9 @@ clean:
 
 all: test_bin test main_bin main
 
+valgrind:
+	valgrind ./test_bin
+
 BigInt.o: BigInt.cpp BigInt.hpp
 	$(CC) $(FLAGS) BigInt.cpp -c
 
